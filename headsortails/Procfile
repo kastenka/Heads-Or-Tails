@@ -1,1 +1,1 @@
-worker: python manage.py telegrambot
+release: python manage.py migrate
