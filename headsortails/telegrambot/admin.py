@@ -15,7 +15,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(GameHistory)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'username', 'bid', 'result', 'created_at')
+    list_display = ('id', 'username', 'bet', 'result', 'created_at')
 
 
 

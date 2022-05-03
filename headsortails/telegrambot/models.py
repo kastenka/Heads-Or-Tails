@@ -47,7 +47,7 @@ class GameHistory(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Username'
     )
-    bid = models.PositiveIntegerField(
+    bet = models.PositiveIntegerField(
         verbose_name='Size of bid'
     )
     result = models.BooleanField(
@@ -60,7 +60,7 @@ class GameHistory(models.Model):
 
     def __str__(self):
         result = 'won' if self.result else 'lost'
-        return f"Game {self.pk}: user {self.username} with rate={self.bid} {result} at {self.created_at}"
+        return f"Game {self.pk}: user {self.username} with rate={self.bet} {result} at {self.created_at}"
 
     class Meta:
         verbose_name = 'Game History'
@@ -69,8 +69,8 @@ class GameHistory(models.Model):
 
 @receiver(post_save, sender=Profile)
 def create_coins_account(sender, instance, created, **kwargs):
+    print(instance)
     Coins.objects.create(
         username=instance,
         coins=GET_COINS_AFTER_REGISTRATION
     )
-
