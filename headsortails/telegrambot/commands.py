@@ -73,8 +73,8 @@ def random_coin_choice():
 def change_coins_amount(user_id, bet, reducing_factor):
     """Function to increase or reduce coins"""
     coins_amount = get_coins_by_user(user_id)
-    coins_amount2 = coins_amount[0][0] + reducing_factor * bet
-    coins_amount.update(coins=coins_amount2)
+    coins_amount_new = coins_amount[0][0] + reducing_factor * bet
+    coins_amount.update(coins=coins_amount_new)
 
 
 def get_user_id(update, context):

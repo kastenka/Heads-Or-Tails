@@ -1,0 +1,26 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <Languages>
+        <language minSize="47" name="Python" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="news.models.News.*" />
+          <option value="todoapp.todo.models.Todo.objects" />
+          <option value="api.snippets.models.Snippet.*" />
+          <option value="socialnetwork.models.Post.objects" />
+          <option value="socialnetwork.models.PostLike.objects" />
+          <option value="socialnetwork.models.Like.objects" />
+          <option value="posts.models.Post.objects" />
+          <option value="users.models.CustomUser.objects" />
+          <option value="django.db.models.fields.related.OneToOneField.*" />
+          <option value="users.models.UserActivity.*" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
