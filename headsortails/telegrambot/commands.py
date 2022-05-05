@@ -15,7 +15,8 @@ from telegrambot.static_text_en import (
     TAILS,
     HEADS,
     NOT_ENOUGH_COINS,
-    HELP_MESSAGE
+    HELP_MESSAGE,
+    UNKNOWN_COMMAND
 )
 from telegrambot.models import Coins, Profile, GameHistory
 
@@ -60,11 +61,10 @@ def play(update: Update, context: CallbackContext):
 
 def unknown(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="Sorry, I didn't understand that command.")
+                             text=UNKNOWN_COMMAND)
 
 
 def random_coin_choice():
-    """ """
     coins_sides = [HEADS, TAILS]
     computer_choice = random.choice(coins_sides)
     return computer_choice
@@ -93,28 +93,28 @@ def get_user_id(update, context):
 def get_username(update, context):
     username = update.effective_chat.username
 
-    # if not username at Telegram
+    # If the username doesn't exist in telegram
     username = username if username else f'User {update.effective_chat.id}'
     return username
 
 
 def get_leader_dashboard(update: Update, context: CallbackContext):
-    """ Get top 10 leaders """
+    """ Get the 10 best players with the highest number of coins """
     top_leaders = Coins.objects.order_by('-coins').values_list('username__username', 'coins')[0:10]
     leaders_str = ""
 
-    max_name_length = max([len(str(item[0])) for item in top_leaders]) # get max_name_length to
-    header_indent_length = max_name_length+(max_name_length-6)
+    max_name_length = max([len(str(item[0])) for item in top_leaders])  # get max_name_length to align the text
+    header_indent_length = max_name_length+(max_name_length-6)  # A parameter for the headline alignment
 
     for item in top_leaders:
         leader, coins = item
         leaders_str += f"{leader:{max_name_length}} {coins}\n"
 
-    first_str = f"{'Username':{header_indent_length}} Coins"
+    header_str = f"{'Username':{header_indent_length}} Coins"
 
     context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=f"*{first_str}*\n"
+        text=f"*{header_str}*\n"
              f"`{leaders_str}`",
         parse_mode=telegram.constants.PARSEMODE_MARKDOWN_V2
     )
@@ -132,11 +132,9 @@ def get_game_history(update: Update, context: CallbackContext):
         result = "Won" if result else "Lost"
 
         game_history_str += f"{created_at:{12}}" \
-                            f"{bet:{4}} " \
-                            f"{result}\n"
-    headers_str = f"{headers[0]:{13}}" \
-                  f"{headers[1]:{4}}" \
-                  f"{headers[2]}"
+                            f"{bet:{5}}  " \
+                            f"{result:{4}}\n"
+    headers_str = f"{headers[0]:{14}} {headers[1]:{5}} {headers[2]:{4}}"
 
     context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -147,7 +145,7 @@ def get_game_history(update: Update, context: CallbackContext):
 
 
 def record_new_game(user_id, bet, result):
-
+    """Function to add the game to the GameHistory table"""
     GameHistory.objects.create(
         bet=bet,
         result=result,
@@ -156,6 +154,7 @@ def record_new_game(user_id, bet, result):
 
 
 def get_coins_by_user(user_id):
+    """To get the number of coins via user_id"""
     coins_amount = Coins.objects.filter(username_id=user_id).values_list('coins')
     return coins_amount
 
