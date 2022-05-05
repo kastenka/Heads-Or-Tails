@@ -12,7 +12,7 @@ HELP_MESSAGE = "This is a bot game called 'Heads Or Tails'\. " \
                "If the player guesses the result, he gets a doubled prize\. Otherwise he loses his bet\.\n" \
                "_Commands:_\n" \
                "/start \- Get info\n" \
-               "/play with the arguments for a new game, /play \[heads, tails\] \[bet\], " \
+               "/play with the arguments for a new game, /play \[heads/tails\] \[bet\], " \
                "e\.g\. /play heads 350 " \
                "or /play tails 110\n" \
                "/leaderboard \- Get the 10 best players with the highest number of coins\n" \
