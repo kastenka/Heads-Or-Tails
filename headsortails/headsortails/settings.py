@@ -132,6 +132,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Telegram settings
 
-TOKEN = '5366536301:AAHF8AvZI8ot1NeQ4zQFnvf0M6Co3zJHsog'
+TOKEN = ''
 
 django_heroku.settings(locals())
