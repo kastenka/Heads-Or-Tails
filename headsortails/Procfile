@@ -1,1 +1,2 @@
-worker: python telegrambot.py
+release: python manage.py migrate --noinput
+worker: python manage.py telegrambot

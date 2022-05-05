@@ -69,7 +69,6 @@ class GameHistory(models.Model):
 
 @receiver(post_save, sender=Profile)
 def create_coins_account(sender, instance, created, **kwargs):
-    print(instance)
     Coins.objects.create(
         username=instance,
         coins=GET_COINS_AFTER_REGISTRATION

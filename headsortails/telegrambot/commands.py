@@ -1,10 +1,22 @@
+import datetime
 import random
 
 import telegram
+from django.db.models import F
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from telegrambot.static_text_en import WRONG_INPUT_EN, WON, LOST, TAILS, HEADS
+from telegram.ext import JobQueue as job
+
+from telegrambot.static_text_en import (
+    WRONG_INPUT,
+    WON,
+    LOST,
+    TAILS,
+    HEADS,
+    NOT_ENOUGH_COINS,
+    HELP_MESSAGE
+)
 from telegrambot.models import Coins, Profile, GameHistory
 
 
@@ -27,12 +39,12 @@ def play(update: Update, context: CallbackContext):
         bet = int(bet)
 
         if bet > get_coins_by_user(user_id)[0][0]:
-            text = "You coins is less then bet"
+            text = NOT_ENOUGH_COINS
             context.bot.send_message(chat_id=update.effective_chat.id, text=text)
-        if coin_choice in ("heads", "tails"):
-            text = coin_choice.upper()
-        else:
-            text = WRONG_INPUT_EN
+            return
+
+        if coin_choice not in ("heads", "tails"):
+            text = WRONG_INPUT
 
         if coin_choice.upper() == random_coin_choice():
             text = WON
@@ -42,8 +54,7 @@ def play(update: Update, context: CallbackContext):
             text = LOST
         record_new_game(user_id, bet, result=(True if text == WON else False))
     except (ValueError, IndexError):
-        text = "Wrong input"
-
+        text = WRONG_INPUT
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
@@ -52,11 +63,8 @@ def unknown(update: Update, context: CallbackContext):
                              text="Sorry, I didn't understand that command.")
 
 
-# def restart(update, context):
-#     Profile.objects.delete(user=get_user_id(update, context))
-
-
 def random_coin_choice():
+    """ """
     coins_sides = [HEADS, TAILS]
     computer_choice = random.choice(coins_sides)
     return computer_choice
@@ -91,10 +99,11 @@ def get_username(update, context):
 
 
 def get_leader_dashboard(update: Update, context: CallbackContext):
+    """ Get top 10 leaders """
     top_leaders = Coins.objects.order_by('-coins').values_list('username__username', 'coins')[0:10]
     leaders_str = ""
 
-    max_name_length = max([len(str(item[0])) for item in top_leaders])
+    max_name_length = max([len(str(item[0])) for item in top_leaders]) # get max_name_length to
     header_indent_length = max_name_length+(max_name_length-6)
 
     for item in top_leaders:
@@ -111,40 +120,34 @@ def get_leader_dashboard(update: Update, context: CallbackContext):
     )
 
 
-def get_info(model, values, update, context):
-    info_objects = model.objects.filter(username_id=get_user_id(update, context)).values_list(
-        **values)
-    info_objects_str = ""
-
-
 def get_game_history(update: Update, context: CallbackContext):
-    game_history = GameHistory.objects.filter(username_id=get_user_id(update, context)).values_list(
-        'created_at', 'bet', 'result')
-
+    game_history = list(GameHistory.objects.filter(username_id=get_user_id(update, context)).values_list(
+        'created_at', 'bet', 'result'))
     game_history_str = ""
-    indent_length = 12
+    headers = ('Date', 'Bet', 'Result')
 
     for item in game_history:
         created_at, bet, result = item
-        created_at = str(created_at)[:10]
-        result = "Won" if result else "Lose"
-        game_history_str += f"{created_at:{indent_length}}" \
-                            f"{bet:{4}}" \
-                            f"{result:{30}}"
+        created_at = str(created_at)[:10]  # get data in 'YYYY-mm-dd' format
+        result = "Won" if result else "Lost"
 
-    first_str = f"{'Date':{indent_length}} " \
-                f"{'Bet'} " \
-                f"{'Result':{16}}"
+        game_history_str += f"{created_at:{12}}" \
+                            f"{bet:{4}} " \
+                            f"{result}\n"
+    headers_str = f"{headers[0]:{13}}" \
+                  f"{headers[1]:{4}}" \
+                  f"{headers[2]}"
 
     context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=f"`{first_str}`\n"
+        text=f"`{headers_str}`\n"
              f"`{game_history_str}`",
         parse_mode=telegram.constants.PARSEMODE_MARKDOWN_V2
     )
 
 
 def record_new_game(user_id, bet, result):
+
     GameHistory.objects.create(
         bet=bet,
         result=result,
@@ -155,3 +158,18 @@ def record_new_game(user_id, bet, result):
 def get_coins_by_user(user_id):
     coins_amount = Coins.objects.filter(username_id=user_id).values_list('coins')
     return coins_amount
+
+
+def get_help(update: Update, context: CallbackContext):
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=HELP_MESSAGE,
+        parse_mode=telegram.constants.PARSEMODE_MARKDOWN_V2
+    )
+
+
+def add_coins(context):
+    """Add 150 coins to each account"""
+    coins = Coins.objects.all().values_list('coins')
+    coins_factor = 150
+    coins.update(coins=(F('coins') + coins_factor))
