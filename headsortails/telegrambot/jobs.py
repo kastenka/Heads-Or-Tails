@@ -1,6 +1,6 @@
 import datetime
 
-from telegrambot.commands import add_coins
+from telegrambot.utils import add_coins
 
 
 def every_day_job(job):
