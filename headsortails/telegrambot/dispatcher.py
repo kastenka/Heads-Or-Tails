@@ -3,6 +3,7 @@ import datetime
 
 from django.conf import settings
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
+from telegram import InlineKeyboardButton
 
 from telegrambot.commands import (
     start,
@@ -28,14 +29,14 @@ def setup_dispatcher(dp):
 
 
 def run_pooling():
-    """ Run bot in pooling mode """
+    """Run bot in pooling mode"""
     updater = Updater(
         token=settings.TOKEN
     )
     dispatcher = updater.dispatcher
     dispatcher = setup_dispatcher(dispatcher)
 
-    # create job
+    # Create job
     jobs = updater.job_queue
     every_day_job(jobs)
 
@@ -43,5 +44,4 @@ def run_pooling():
                         level=logging.INFO)
 
     updater.start_polling()
-    # updater.start_polling(timeout=123)
-    # updater.idle()
+    # updater.idle()  # Ctrl+C click handler

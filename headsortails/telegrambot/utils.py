@@ -50,8 +50,7 @@ def record_new_game(user_id, bet, result):
 
 
 def get_coins_by_user(user_id):
-    """To get the number of coins via user_id"""
-    # coins_amount = Coins.objects.filter(username_id=user_id).values_list('coins')
+    """Get the number of coins by user_id"""
     coins_amount = Coins.objects.get(username=user_id)
     return coins_amount.coins
 

@@ -54,12 +54,12 @@ def unknown(update: Update, context: CallbackContext):
 
 
 def get_leader_dashboard(update: Update, context: CallbackContext):
-    """ Get the 10 best players with the highest number of coins """
+    """Get the 10 best players with the highest number of coins"""
     top_leaders = Coins.objects.order_by('-coins').values_list('username__username', 'coins')[0:10]
     leaders_str = ""
 
-    max_name_length = max([len(str(item[0])) for item in top_leaders])  # get max_name_length to align the text
-    header_indent_length = max_name_length+(max_name_length-6)  # a parameter for the header alignment
+    max_name_length = max([len(str(item[0])) for item in top_leaders])  # Get max_name_length to align the text
+    header_indent_length = max_name_length+(max_name_length-6)  # Parameter for the header alignment
 
     for item in top_leaders:
         leader, coins = item
@@ -83,10 +83,11 @@ def get_game_history(update: Update, context: CallbackContext):
 
     for item in game_history:
         created_at, bet, result = item
-        created_at = str(created_at)[:10]  # get data in 'YYYY-mm-dd' format
+        created_at = str(created_at)[:10]  # Get data in 'YYYY-mm-dd' format (use 10 first symbols)
         result = "Won" if result else "Lost"
 
-        text_align = 6 - len(str(bet))
+        text_align = 6 - len(str(bet))  # text_align parameter for the elements alignment
+
         game_history_str += f"{created_at:{12}} " \
                             f"{bet}{' '*text_align}" \
                             f"{result}\n"
