@@ -7,7 +7,7 @@ GET_COINS_AFTER_REGISTRATION = 1000
 
 
 class Profile(models.Model):
-    external_id = models.PositiveIntegerField(
+    external_id = models.BigIntegerField(
         unique=True,
         verbose_name='Telegram User ID'
     )
@@ -29,7 +29,7 @@ class Coins(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Username'
     )
-    coins = models.PositiveIntegerField(
+    coins = models.BigIntegerField(
         verbose_name='Number of coins'
     )
 
