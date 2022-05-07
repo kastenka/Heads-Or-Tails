@@ -26,3 +26,5 @@ HELP_MESSAGE = "This is a bot game called 'Heads Or Tails'\. " \
                "/help \- What can this bot do?"
 
 UNKNOWN_COMMAND = "I don't know such a command"
+
+NO_INFO = "Nothing to show"

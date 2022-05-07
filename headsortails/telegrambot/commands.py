@@ -3,18 +3,18 @@ from telegram import Update
 from telegram.ext import CallbackContext
 
 from telegrambot.static_text_en import (WRONG_INPUT, WON, LOST, TAILS, HEADS, NOT_ENOUGH_COINS,
-                                        HELP_MESSAGE, UNKNOWN_COMMAND)
+                                        HELP_MESSAGE, UNKNOWN_COMMAND, NO_INFO)
 from telegrambot.models import Coins, Profile, GameHistory
 
 from telegrambot.utils import (get_user_id, get_coins_by_user, change_coins_amount,
-                               random_coin_choice, record_new_game)
+                               random_coin_choice, record_new_game, get_username)
 
 
 def start(update: Update, context: CallbackContext):
     user_id = get_user_id(update, context)
     coins_amount = get_coins_by_user(user_id)
     text = f"Hi! Welcome to the game!\n" \
-           f"Username - {update.effective_chat.username}\n" \
+           f"Username - {get_username(update, context)}\n" \
            f"Coins - {coins_amount}"
 
     context.bot.send_message(
@@ -56,8 +56,11 @@ def unknown(update: Update, context: CallbackContext):
 def get_leader_dashboard(update: Update, context: CallbackContext):
     """Get the 10 best players with the highest number of coins"""
     top_leaders = Coins.objects.order_by('-coins').values_list('username__username', 'coins')[0:10]
-    leaders_str = ""
 
+    if check_null_data(top_leaders, context, update):
+        return
+
+    leaders_str = ""
     max_name_length = max([len(str(item[0])) for item in top_leaders])  # Get max_name_length to align the text
     header_indent_length = max_name_length+(max_name_length-6)  # Parameter for the header alignment
 
@@ -79,8 +82,11 @@ def get_leader_dashboard(update: Update, context: CallbackContext):
 def get_game_history(update: Update, context: CallbackContext):
     game_history = GameHistory.objects.filter(username_id=get_user_id(update, context)).values_list(
         'created_at', 'bet', 'result')
-    game_history_str = ""
 
+    if check_null_data(game_history, context, update):
+        return
+
+    game_history_str = ""
     for item in game_history:
         created_at, bet, result = item
         created_at = str(created_at)[:10]  # Get data in 'YYYY-mm-dd' format (use 10 first symbols)
@@ -110,3 +116,11 @@ def get_help(update: Update, context: CallbackContext):
         text=HELP_MESSAGE,
         parse_mode=telegram.constants.PARSEMODE_MARKDOWN_V2
     )
+
+
+def check_null_data(data, context, update):
+    if not data:
+        text = NO_INFO
+        context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        return True
+    return False
