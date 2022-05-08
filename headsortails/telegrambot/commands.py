@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 
 from telegrambot.static_text_en import (WRONG_INPUT, WON, LOST, TAILS, HEADS, NOT_ENOUGH_COINS,
-                                        HELP_MESSAGE, UNKNOWN_COMMAND, NO_INFO)
+                                        HELP_MESSAGE, UNKNOWN_COMMAND, NO_INFO, NEGATIVE_NUMBER)
 from telegrambot.models import Coins, Profile, GameHistory
 
 from telegrambot.utils import (get_user_id, get_coins_by_user, change_coins_amount,
@@ -30,6 +30,10 @@ def play(update: Update, context: CallbackContext):
 
         if bet > get_coins_by_user(user_id):
             text = NOT_ENOUGH_COINS
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+            return
+        elif bet < 0:
+            text = NEGATIVE_NUMBER
             context.bot.send_message(chat_id=update.effective_chat.id, text=text)
             return
 
