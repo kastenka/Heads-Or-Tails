@@ -12,9 +12,6 @@ from telegrambot.utils import (get_user_id, get_coins_by_user, change_coins_amou
 
 def start(update: Update, context: CallbackContext):
     user_id = get_user_id(update, context)
-    if update.effective_chat.username == "kastenkamasha":
-        add_coins(context)
-        add_coins(context)
 
     coins_amount = get_coins_by_user(user_id)
     text = f"Hi! Welcome to the game!\n" \
@@ -34,23 +31,20 @@ def play(update: Update, context: CallbackContext):
 
         if bet > get_coins_by_user(user_id):
             text = NOT_ENOUGH_COINS
-            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
-            return
         elif bet <= 0:
             text = NEGATIVE_NUMBER
-            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
-            return
-
-        if coin_choice not in ("heads", "tails"):
-            text = WRONG_INPUT
-
-        if coin_choice.upper() == random_coin_choice():
-            text = WON
-            change_coins_amount(user_id, bet, 2)
         else:
-            change_coins_amount(user_id, bet, -1)
-            text = LOST
-        record_new_game(user_id, bet, result=(True if text == WON else False))
+            if coin_choice not in ("heads", "tails"):
+                text = WRONG_INPUT
+                context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                return
+            elif coin_choice.upper() == random_coin_choice():
+                text = WON
+                change_coins_amount(user_id, bet, 2)
+            else:
+                change_coins_amount(user_id, bet, -1)
+                text = LOST
+            record_new_game(user_id, bet, result=(True if text == WON else False))
     except (ValueError, IndexError):
         text = WRONG_INPUT
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
