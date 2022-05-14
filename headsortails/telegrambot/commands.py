@@ -88,6 +88,9 @@ def get_game_history(update: Update, context: CallbackContext):
         return
 
     game_history_str = ""
+    first_str_align = 12
+    second_str_align = 5
+
     for item in game_history:
         created_at, bet, result = item
         created_at = str(created_at)[:10]  # Get data in 'YYYY-mm-dd' format (use 10 first symbols)
@@ -95,12 +98,12 @@ def get_game_history(update: Update, context: CallbackContext):
 
         text_align = 6 - len(str(bet))  # text_align parameter for the elements alignment
 
-        game_history_str += f"{created_at:{12}} " \
+        game_history_str += f"{created_at:{first_str_align}} " \
                             f"{bet}{' '*text_align}" \
                             f"{result}\n"
 
-    header_str = f"{'Date':{12}} " \
-                 f"{'Bet':{5}} " \
+    header_str = f"{'Date':{first_str_align}} " \
+                 f"{'Bet':{second_str_align}} " \
                  f"Result"
 
     context.bot.send_message(
