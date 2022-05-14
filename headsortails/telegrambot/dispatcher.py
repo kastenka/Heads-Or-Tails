@@ -4,27 +4,20 @@ import datetime
 from django.conf import settings
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 from telegram import InlineKeyboardButton
-
-from telegrambot.commands import (
-    start,
-    play,
-    get_leader_dashboard,
-    get_game_history,
-    unknown,
-    get_help
-)
 from telegrambot.jobs import every_day_job
+
+import telegrambot.commands as commands
 
 
 def setup_dispatcher(dp):
-    dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CommandHandler('play', play))
-    dp.add_handler(CommandHandler('leaderboard', get_leader_dashboard))
-    dp.add_handler(CommandHandler('gamehistory', get_game_history))
-    dp.add_handler(CommandHandler('help', get_help))
+    dp.add_handler(CommandHandler('start', commands.start))
+    dp.add_handler(CommandHandler('play', commands.play))
+    dp.add_handler(CommandHandler('leaderboard', commands.get_leader_dashboard))
+    dp.add_handler(CommandHandler('gamehistory', commands.get_game_history))
+    dp.add_handler(CommandHandler('help', commands.get_help))
 
     # unknown handler
-    dp.add_handler(MessageHandler(Filters.command, unknown))
+    dp.add_handler(MessageHandler(Filters.command, commands.unknown))
     return dp
 
 
